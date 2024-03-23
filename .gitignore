@@ -1,0 +1,10 @@
+.build
+.mbed
+projectfiles
+*.py*
+mbed-os
+max30002
+max32630fthr
+MAX8614X
+BUILD
+
