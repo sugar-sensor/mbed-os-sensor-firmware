@@ -15,6 +15,7 @@ class BioZ {
 
 public:
   BioZ(SPI &spi, DigitalOut &cs);
+  int revision();
 
 private:
   SPI &p_spi;
