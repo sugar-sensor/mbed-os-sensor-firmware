@@ -8,9 +8,8 @@
 #include "helper.h"
 #include "mbed.h"
 #include "optics.h"
-#include <cstdio>
+#include "storage.h"
 
-// Common definitions
 SPI spi(P5_1, P5_2, P5_0); // mosi, miso, sclk for common SPI bus
 DigitalIn s0(P4_2, PullDown);  // accordin to spec unused SPIS ports
 DigitalIn s1(P4_4, PullDown);  // must be configured as high-impedance
@@ -26,6 +25,8 @@ int main() {
   Optics optics(spi, cso);
   BioZ bioz(spi, csb); // BioZ initialized after optics faster than vise-a-versa. 
                        // Might be interrupt that is registered for Optics during initialization in constructor
+  Storage storage; // Init SD card
+  storage.test();                  
 
   // TODO logic  
 };

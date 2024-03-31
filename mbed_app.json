@@ -3,11 +3,16 @@
         "*": {
             "target.c_lib": "small",
             "target.printf_lib": "minimal-printf",
+			"target.components_add" : ["SD"],
             "platform.minimal-printf-enable-floating-point": false,
             "platform.stdio-minimal-console-only": true,
             "platform.stdio-baud-rate": 115200,
             "platform.default-serial-baud-rate": 115200,
-            "platform.stdio-buffered-serial": true
+            "platform.stdio-buffered-serial": true,
+			"sd.SPI_MOSI" : "P0_5",
+			"sd.SPI_MISO" : "P0_6",
+			"sd.SPI_CLK"  : "P0_4",
+			"sd.SPI_CS"   : "P0_7"
         }
     }
 }
