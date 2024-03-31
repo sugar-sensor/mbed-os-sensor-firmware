@@ -8,13 +8,14 @@
 #include "errno.h"
 #include "mbed.h"
 #include <cstdio>
+#include <cstring>
+#include <string>
 
 FATFileSystem fs("fs");
 
-Storage::Storage() { bd = SDBlockDevice::get_default_instance(); }
-
-int Storage::test() {
-  printf("--- File system test ---\n");
+/****************************************************/
+Storage::Storage() {
+  bd = SDBlockDevice::get_default_instance();
   printf("--- Mounting filesystem ---\n");
   fflush(stdout);
   int err = fs.mount(bd);
@@ -22,12 +23,17 @@ int Storage::test() {
 
   if (err) {
     error("error: %s (%d)\n", strerror(-err), err);
-    return -1;
   }
+  std::string fileName = "measurement" + std::to_string(files()) + ".csv";
+  measurements.open(&fs, fileName.c_str(), O_CREAT | O_WRONLY);
+}
+/****************************************************/
 
-  printf("Opening the root directory...\n");
+/****************************************************/
+int Storage::list() {
+  printf("--- List root folder ---\n");
   Dir d;
-  err = d.open(&fs, ".");
+  int err = d.open(&fs, "/");
   if (err) {
     error("error: %s (%d)\n", strerror(-err), err);
     return -1;
@@ -38,16 +44,52 @@ int Storage::test() {
     ssize_t res = d.read(&entry);
     if (res < 0) {
       printf("Error reading directory\n");
-      break;
+      return res;
     } else if (res == 0) {
       // End of directory
       break;
     } else {
-      printf("%s , type: %d\n", entry.d_name, entry.d_type);
+      if (entry.d_type == 5) {
+        File f;
+        f.open(&fs, entry.d_name);
+        printf("%s, type: %d, size:%lu\n", entry.d_name, entry.d_type,
+               f.size());
+        f.close();
+      } else {
+        printf("%s, type: %d\n", entry.d_name, entry.d_type);
+      }
     }
   }
-
   d.close();
-
   return 0;
+}
+/****************************************************/
+int Storage::append(std::string str) {
+  const char *data = str.c_str();
+  int written = measurements.write(data, str.length());
+  if (written < 0) {
+    printf("Error writing to file\n");
+    measurements.close();
+    fs.unmount();
+    return -1;
+  }
+  measurements.sync();
+  return 0;
+}
+
+/****************************************************/
+int Storage::files() {
+  Dir d;
+  int err = d.open(&fs, ".");
+  if (err) {
+    error("error: %s (%d)\n", strerror(-err), err);
+    return -1;
+  }
+  return d.size();
+}
+
+/****************************************************/
+void Storage::close() {
+    measurements.close();
+    fs.unmount();
 }
