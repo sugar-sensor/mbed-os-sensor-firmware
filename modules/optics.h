@@ -14,12 +14,12 @@ class Optics {
 
 public:
   Optics(SPI &spi, DigitalOut &cs);
+  MAX8614X p_chip;
 
 private:
   static const PinName INT_PIN = P3_2; // interrupt pin for MAX86141
   SPI &p_spi;
   DigitalOut &p_cs;
-  MAX8614X p_chip;
 
 };
 

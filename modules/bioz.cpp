@@ -8,7 +8,7 @@
 #include "mbed.h"
 
 BioZ::BioZ(SPI &spi, DigitalOut &cs)
-    : p_spi(spi), p_cs(cs), p_chip(p_spi, p_cs) {
+    : p_spi(spi), p_cs(cs), p_chip(spi, cs) {
 
   uint32_t data[1];
   printf("Initilizing MAX30002: ");

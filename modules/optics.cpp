@@ -12,4 +12,5 @@ Optics::Optics(SPI &spi, DigitalOut &cs)
   while (p_chip.init() < 0) {
     wait_us(500000);
   };
+  
 }

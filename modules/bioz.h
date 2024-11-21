@@ -14,13 +14,13 @@
 class BioZ {
 
 public:
-  BioZ(SPI &spi, DigitalOut &cs);
-  int revision();
+    BioZ(SPI &spi, DigitalOut &cs);
+    MAX30002 p_chip;
+    int revision();
 
 private:
-  SPI &p_spi;
-  DigitalOut &p_cs;
-  MAX30002 p_chip;
+    SPI &p_spi;
+    DigitalOut &p_cs;
 };
 
 #endif // _BIOZ_H_
