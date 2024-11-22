@@ -6,6 +6,7 @@
 
 #include "bioz.h"
 #include "mbed.h"
+#include <cstdio>
 
 BioZ::BioZ(SPI &spi, DigitalOut &cs)
     : p_spi(spi), p_cs(cs), p_chip(spi, cs) {
@@ -33,4 +34,12 @@ int BioZ::revision() {
   result.all = data[0];
   return result.bit.rev_id;
 
+}
+
+int BioZ::readRegister(MAX30002::REG_map_t reg, uint32_t *data) {
+    return p_chip.readRegister(reg, data);
+}
+
+int BioZ::writeRegister(MAX30002::REG_map_t reg, uint32_t data) {
+    return p_chip.writeRegister(reg, data);
 }

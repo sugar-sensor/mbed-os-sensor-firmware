@@ -9,6 +9,7 @@
 #include "mbed.h"
 #include "optics.h"
 #include "storage.h"
+#include <cmath>
 #include <cstdio>
 #include <ctime>
 #include <string>
@@ -37,25 +38,34 @@ int main() {
   storage.list(); // list storage files
 
   /* Configure optical chip*/
-  optics.p_chip.writeRegister(MAX8614X::MAX8614X_LED1_PA_REG, 0xC8);  // LED1 current C8 (200) * 0.12 = 24 mA
-  optics.p_chip.writeRegister(MAX8614X::MAX8614X_PPG_CFG2_REG, 0x00); // sampling rate 25sps
+  optics.writeRegister(MAX8614X::MAX8614X_LED1_PA_REG, 0xC8);  // LED1 current C8 (200) * 0.12 = 24 mA
+  optics.writeRegister(MAX8614X::MAX8614X_PPG_CFG2_REG, 0x00); // sampling rate 25sps
   
   /* Configure BioZ*/
   // generator settings
   MAX30002::cnfg_gen_reg cnfg_gen;
   cnfg_gen.bit.en_bioz = 1;
-  bioz.p_chip.writeRegister(MAX30002::CNFG_GEN, cnfg_gen.all);
+  bioz.writeRegister(MAX30002::CNFG_GEN, cnfg_gen.all);
   
   // bioz settings
   MAX30002::cnfg_bioz_reg cnfg_bioz;
   cnfg_bioz.bit.ahpf = 0b111; // bypass AHPF
   cnfg_bioz.bit.fcgen = 0; // max modulation frequency = 4 * fMSTR
-  bioz.p_chip.writeRegister(MAX30002::CNFG_BIOZ, cnfg_bioz.all);
-  bioz.p_chip.writeRegister(MAX30002::SYNCH, 0x00);
+  bioz.writeRegister(MAX30002::CNFG_BIOZ, cnfg_bioz.all);
+  bioz.writeRegister(MAX30002::SYNCH, 0x00);
   
   // --------------- working cycle ----------------//
   int rounds = 360; // 1 round ~10 sec = 1 hour
+  printf("Started\n");
   while (rounds > 0) {
+        // ****************  Optical part ********************//  
+        optics.writeRegister(MAX8614X::MAX8614X_LED_SEQ1_REG, 0x91); // led1 with ambient light    
+        vector<pair<uint32_t,uint32_t>> output = optics.readFIFOdata();
+        printf("Grouped averages (rounded up):\n");
+        for (const auto& tuple : output) {
+            printf("Tag: %d, Average: %d\n", tuple.first, tuple.second);
+        }
+        // ****************  Optical part end ********************//  
       
       std::string str = std::to_string(time(NULL));
       str.append(";");
@@ -69,10 +79,13 @@ int main() {
       storage.append(str);
   
       rounds--;
+      printf("Round %d/360\n", 360 - rounds);
+      wait_us(3000000);
   }
   
   // --------------- finalization ----------------//
 
   storage.close();
+  printf("Finished\n");
 
 };

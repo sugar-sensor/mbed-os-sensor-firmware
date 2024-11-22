@@ -15,12 +15,14 @@ class BioZ {
 
 public:
     BioZ(SPI &spi, DigitalOut &cs);
-    MAX30002 p_chip;
     int revision();
+    int readRegister(MAX30002::REG_map_t reg, uint32_t *data);
+    int writeRegister(MAX30002::REG_map_t reg, uint32_t data);
 
 private:
     SPI &p_spi;
     DigitalOut &p_cs;
+    MAX30002 p_chip;
 };
 
 #endif // _BIOZ_H_
