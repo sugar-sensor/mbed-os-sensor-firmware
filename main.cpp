@@ -14,69 +14,71 @@
 #include <ctime>
 #include <string>
 
-SPI spi(P5_1, P5_2, P5_0); // mosi, miso, sclk for common SPI bus
-DigitalIn s0(P4_2, PullDown);  // accordin to spec unused SPIS ports
-DigitalIn s1(P4_4, PullDown);  // must be configured as high-impedance
-DigitalIn s2(P4_5, PullDown);  // inputs
+SPI spi(P5_1, P5_2, P5_0);    // mosi, miso, sclk for common SPI bus
+DigitalIn s0(P4_2, PullDown); // accordin to spec unused SPIS ports
+DigitalIn s1(P4_4, PullDown); // must be configured as high-impedance
+DigitalIn s2(P4_5, PullDown); // inputs
 DigitalIn s3(P4_6, PullDown);
 DigitalIn s4(P4_7, PullDown);
-DigitalOut cso(P5_3);   // MAX86141 selection, optics
-DigitalOut csb(P5_4);   // MAX30002 selection, bioz
-uint32_t data[1];       // BioZ data single element array
-MAX30002::fifo fifo;    // BioZ FIFO    
+DigitalOut cso(P5_3); // MAX86141 selection, optics
+DigitalOut csb(P5_4); // MAX30002 selection, bioz
+uint32_t data[1];     // BioZ data single element array
+MAX30002::fifo fifo;  // BioZ FIFO
 
 int main() {
   printf("\nSensor module firmware v0.0.2\n");
   // --------------- HW initialization ----------------//
   set_time(1733004000); // set time to 01.12.2024 00:00
   boardInit();
-  
+
   Optics optics(spi, cso);
-  BioZ bioz(spi, csb); // BioZ initialized after optics faster than vise-a-versa. 
-                       // Might be interrupt that is registered for Optics during initialization in constructor
+  BioZ bioz(spi, csb); // BioZ initialized after optics faster than
+                       // vise-a-versa. Might be interrupt that is registered
+                       // for Optics during initialization in constructor
   Storage storage; // Init SD card
-  storage.list(); // list storage files
+  storage.list();  // list storage files
 
   /* Configure optical chip*/
-  optics.writeRegister(MAX8614X::MAX8614X_LED1_PA_REG, 0xC8);  // LED1 current C8 (200) * 0.12 = 24 mA
+  optics.writeRegister(MAX8614X::MAX8614X_LED1_PA_REG, 0xC8); // LED1 current C8 (200) * 0.12 = 24 mA
   optics.writeRegister(MAX8614X::MAX8614X_PPG_CFG2_REG, 0x00); // sampling rate 25sps
-  
+
   /* Configure BioZ*/
   // generator settings
   MAX30002::cnfg_gen_reg cnfg_gen;
   cnfg_gen.bit.en_bioz = 1;
   bioz.writeRegister(MAX30002::CNFG_GEN, cnfg_gen.all);
-  
+
   // bioz settings
   MAX30002::cnfg_bioz_reg cnfg_bioz;
   cnfg_bioz.bit.ahpf = 0b111; // bypass AHPF
-  cnfg_bioz.bit.fcgen = 0; // max modulation frequency = 4 * fMSTR
+  cnfg_bioz.bit.fcgen = 0;    // max modulation frequency = 4 * fMSTR
   bioz.writeRegister(MAX30002::CNFG_BIOZ, cnfg_bioz.all);
   bioz.writeRegister(MAX30002::SYNCH, 0x00);
-  
+
   // --------------- working cycle ----------------//
   int rounds = 360; // 1 round ~10 sec = 1 hour
   printf("Started\n");
   while (rounds > 0) {
-        Sample sample;
- 
-         // ****************  Optical part ********************//  
-        optics.writeRegister(MAX8614X::MAX8614X_LED_SEQ1_REG, 0x91); // led1 with ambient light    
-        vector<pair<uint32_t,uint32_t>> output = optics.readFIFOdata();
-        sample.setData(output);
-        sample.setTime(time(NULL));
-        storage.append(sample);
-        // ****************  Optical part end ********************//  
-      
-  
-      rounds--;
-      printf("Round %d/360\n", 360 - rounds);
-      wait_us(3000000);
+
+    // ****************  Optical part *****************//
+    optics.writeRegister(MAX8614X::MAX8614X_LED_SEQ1_REG, 0x91); // led1 with ambient light
+    vector<pair<uint32_t, uint32_t>> odata = optics.readFIFOdata();
+    Sample sampleO(time(NULL), 0, odata);
+    storage.append(sampleO);
+    // ****************  Optical part end *************//
+
+    // ****************  BioZ part ********************//
+    vector<pair<uint32_t, uint32_t>> bdata = bioz.readFIFOdata();
+    Sample sampleB(time(NULL), 1, bdata);
+    storage.append(sampleB);
+    // ****************  BioZ part end ****************//
+    rounds--;
+    printf("Round %d/360\n", 360 - rounds);
+    wait_us(3000000);
   }
-  
+
   // --------------- finalization ----------------//
 
   storage.close();
   printf("Finished\n");
-
 };
