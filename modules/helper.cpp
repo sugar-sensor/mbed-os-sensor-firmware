@@ -6,6 +6,8 @@
  
 #include "helper.h"
 
+
+/****************************************************/
 void boardInit() {
   printf("Initializing interface board: ");
   MAX32630FTHR mbed_board;
@@ -16,4 +18,3 @@ void boardInit() {
   }
   printf("done!\n");
 }
-  

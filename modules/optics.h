@@ -9,9 +9,6 @@
 
 #include "mbed.h"
 #include "MAX8614X.h"
-#include <numeric>
-#include <unordered_map>
-#include <utility>
 #include <vector>
 
 class Optics {

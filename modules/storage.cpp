@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <vector>
 
 FATFileSystem fs("fs");
 
@@ -27,7 +28,6 @@ Storage::Storage() {
   std::string fileName = "measurement" + std::to_string(files()) + ".csv";
   measurements.open(&fs, fileName.c_str(), O_CREAT | O_WRONLY);
 }
-/****************************************************/
 
 /****************************************************/
 int Storage::list() {
@@ -78,6 +78,22 @@ int Storage::append(std::string str) {
 }
 
 /****************************************************/
+int Storage::append(Sample sample) {
+  std::string str;
+  // TODO format to write sample
+  //   str.append(";");
+  //   str.append("test value\n");
+  //   storage.append(str);
+  //   wait_us(2000000);
+  //   str.clear();
+  //   str.assign(std::to_string(time(NULL)));
+  //   str.append(";");
+  //   str.append("test 2 value\n");
+  //   storage.append(str);
+  return 0;
+}
+
+/****************************************************/
 int Storage::files() {
   Dir d;
   int err = d.open(&fs, ".");
@@ -90,6 +106,6 @@ int Storage::files() {
 
 /****************************************************/
 void Storage::close() {
-    measurements.close();
-    fs.unmount();
+  measurements.close();
+  fs.unmount();
 }

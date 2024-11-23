@@ -58,25 +58,16 @@ int main() {
   int rounds = 360; // 1 round ~10 sec = 1 hour
   printf("Started\n");
   while (rounds > 0) {
-        // ****************  Optical part ********************//  
+        Sample sample;
+ 
+         // ****************  Optical part ********************//  
         optics.writeRegister(MAX8614X::MAX8614X_LED_SEQ1_REG, 0x91); // led1 with ambient light    
         vector<pair<uint32_t,uint32_t>> output = optics.readFIFOdata();
-        printf("Grouped averages (rounded up):\n");
-        for (const auto& tuple : output) {
-            printf("Tag: %d, Average: %d\n", tuple.first, tuple.second);
-        }
+        sample.setData(output);
+        sample.setTime(time(NULL));
+        storage.append(sample);
         // ****************  Optical part end ********************//  
       
-      std::string str = std::to_string(time(NULL));
-      str.append(";");
-      str.append("test value\n");
-      storage.append(str);
-      wait_us(2000000);
-      str.clear();
-      str.assign(std::to_string(time(NULL)));
-      str.append(";");
-      str.append("test 2 value\n");
-      storage.append(str);
   
       rounds--;
       printf("Round %d/360\n", 360 - rounds);

@@ -5,7 +5,12 @@
  */
 
 #include "optics.h"
+#include <numeric>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
+/****************************************************/
 Optics::Optics(SPI &spi, DigitalOut &cs)
     : p_spi(spi), p_cs(cs), p_chip(spi, cs, INT_PIN) {
 
@@ -15,10 +20,12 @@ Optics::Optics(SPI &spi, DigitalOut &cs)
 
 }
 
+/****************************************************/
 int Optics::writeRegister(uint8_t reg, const uint8_t data) {
     return p_chip.writeRegister(reg, data);
 }
 
+/****************************************************/
 vector<pair<uint32_t, uint32_t>> Optics::readFIFOdata() {
 
     vector<pair<uint32_t, uint32_t>> input;

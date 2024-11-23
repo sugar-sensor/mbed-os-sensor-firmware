@@ -9,8 +9,10 @@
 
 #include "mbed.h"
 #include "FATFileSystem.h"
+#include "helper.h"
 #include "SDBlockDevice.h"
 #include <string>
+#include <vector>
 
 
 // Maximum number of elements in buffer
@@ -23,6 +25,7 @@ public:
   Storage();
   int list();
   int append(std::string str);
+  int append(Sample sample);
   void close();
 
 private:
