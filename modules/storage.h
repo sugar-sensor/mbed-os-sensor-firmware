@@ -25,7 +25,7 @@ public:
   Storage();
   int list();
   int append(std::string str);
-  int append(Sample sample);
+  void append(Sample sample);
   void close();
 
 private:

@@ -78,7 +78,7 @@ int Storage::append(std::string str) {
 }
 
 /****************************************************/
-int Storage::append(Sample sample) {
+void Storage::append(Sample sample) {
   std::string str;
   str.assign(std::to_string(sample.getTime()));
   str.append(";");
@@ -91,8 +91,8 @@ int Storage::append(Sample sample) {
   }
   
   str.pop_back(); // remove last "-"
+  str.append("\n"); 
   append(str);
-  return 0;
 }
 
 /****************************************************/

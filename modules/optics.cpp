@@ -21,14 +21,12 @@ Optics::Optics(SPI &spi, DigitalOut &cs)
 }
 /****************************************************/
 int Optics::disable() {
-    // TODO disable readings
-    return 0;
+    return writeRegister(MAX8614X::MAX8614X_LED1_PA_REG, 0x00); // LED1 current C8 (0) * 0.12 = 0 mA
 }
 
 /****************************************************/
 int Optics::enable() {
-    // TODO enable readings
-    return 0;
+    return writeRegister(MAX8614X::MAX8614X_LED1_PA_REG, 0xC8); // LED1 current C8 (200) * 0.12 = 24 mA
 }
 
 /****************************************************/

@@ -40,6 +40,7 @@ int main() {
   /* Configure optical chip*/
   optics.writeRegister(MAX8614X::MAX8614X_LED1_PA_REG, 0xC8); // LED1 current C8 (200) * 0.12 = 24 mA
   optics.writeRegister(MAX8614X::MAX8614X_PPG_CFG2_REG, 0x00); // sampling rate 25sps
+  // TODO more configuration options should be explored to enable power down, reset and measurements start/stop
 
   /* Configure BioZ*/
   // generator settings
