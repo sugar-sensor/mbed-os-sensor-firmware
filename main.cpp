@@ -22,7 +22,6 @@ DigitalIn s3(P4_6, PullDown);
 DigitalIn s4(P4_7, PullDown);
 DigitalOut cso(P5_3); // MAX86141 selection, optics
 DigitalOut csb(P5_4); // MAX30002 selection, bioz
-uint32_t data[1];     // BioZ data single element array
 MAX30002::fifo fifo;  // BioZ FIFO
 
 int main() {
@@ -61,17 +60,22 @@ int main() {
   while (rounds > 0) {
 
     // ****************  Optical part *****************//
+    optics.enable();
     optics.writeRegister(MAX8614X::MAX8614X_LED_SEQ1_REG, 0x91); // led1 with ambient light
     vector<pair<uint32_t, uint32_t>> odata = optics.readFIFOdata();
     Sample sampleO(time(NULL), 0, odata);
+    optics.disable();
     storage.append(sampleO);
     // ****************  Optical part end *************//
 
     // ****************  BioZ part ********************//
+    bioz.enable();
     vector<pair<uint32_t, uint32_t>> bdata = bioz.readFIFOdata();
     Sample sampleB(time(NULL), 1, bdata);
+    bioz.disable();
     storage.append(sampleB);
     // ****************  BioZ part end ****************//
+
     rounds--;
     printf("Round %d/360\n", 360 - rounds);
     wait_us(3000000);

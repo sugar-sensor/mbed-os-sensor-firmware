@@ -16,10 +16,12 @@ class BioZ {
 
 public:
   BioZ(SPI &spi, DigitalOut &cs);
-  int revision();
-  int readRegister(MAX30002::REG_map_t reg, uint32_t *data);
-  int writeRegister(MAX30002::REG_map_t reg, uint32_t data);
+  int disable();
+  int enable();
   vector<pair<uint32_t, uint32_t>> readFIFOdata();
+  int readRegister(MAX30002::REG_map_t reg, uint32_t *data);
+  int revision();
+  int writeRegister(MAX30002::REG_map_t reg, uint32_t data);
 
 private:
   SPI &p_spi;

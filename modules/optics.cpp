@@ -19,6 +19,17 @@ Optics::Optics(SPI &spi, DigitalOut &cs)
   };
 
 }
+/****************************************************/
+int Optics::disable() {
+    // TODO disable readings
+    return 0;
+}
+
+/****************************************************/
+int Optics::enable() {
+    // TODO enable readings
+    return 0;
+}
 
 /****************************************************/
 int Optics::writeRegister(uint8_t reg, const uint8_t data) {

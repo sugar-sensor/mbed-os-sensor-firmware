@@ -80,16 +80,18 @@ int Storage::append(std::string str) {
 /****************************************************/
 int Storage::append(Sample sample) {
   std::string str;
-  // TODO format to write sample
-  //   str.append(";");
-  //   str.append("test value\n");
-  //   storage.append(str);
-  //   wait_us(2000000);
-  //   str.clear();
-  //   str.assign(std::to_string(time(NULL)));
-  //   str.append(";");
-  //   str.append("test 2 value\n");
-  //   storage.append(str);
+  str.assign(std::to_string(sample.getTime()));
+  str.append(";");
+  str.append(std::to_string(sample.getType()));
+  str.append(";");
+  
+  for (const auto &tuple : sample.getData()) {
+    str.append("(" + std::to_string(tuple.first) + "," + std::to_string(tuple.second) + ")");
+    str.append("-");
+  }
+  
+  str.pop_back(); // remove last "-"
+  append(str);
   return 0;
 }
 

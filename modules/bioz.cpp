@@ -28,6 +28,26 @@ BioZ::BioZ(SPI &spi, DigitalOut &cs) : p_spi(spi), p_cs(cs), p_chip(spi, cs) {
 }
 
 /****************************************************/
+int BioZ::disable() {
+    MAX30002::cnfg_gen_reg cnfg_gen;
+    uint32_t data[1];
+
+    readRegister(MAX30002::CNFG_GEN, data);
+    cnfg_gen.all = data[0]; // persist old settings
+    cnfg_gen.bit.en_bioz = 0;
+    return writeRegister(MAX30002::CNFG_GEN, cnfg_gen.all);
+}
+/****************************************************/
+int BioZ::enable() {
+    MAX30002::cnfg_gen_reg cnfg_gen;
+    uint32_t data[1];
+
+    readRegister(MAX30002::CNFG_GEN, data);
+    cnfg_gen.all = data[0]; // persist old settings
+    cnfg_gen.bit.en_bioz = 1;
+    return writeRegister(MAX30002::CNFG_GEN, cnfg_gen.all);
+}
+/****************************************************/
 int BioZ::revision() {
   uint32_t data[1];
   MAX30002::info_reg result;

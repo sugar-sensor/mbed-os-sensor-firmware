@@ -17,6 +17,8 @@ public:
   Optics(SPI &spi, DigitalOut &cs);
   int writeRegister(uint8_t reg, const uint8_t data);
   vector<pair<uint32_t, uint32_t>> readFIFOdata();
+  int enable();
+  int disable();
 
 private:
   static const PinName INT_PIN = P3_2; // interrupt pin for MAX86141
