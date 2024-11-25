@@ -27,6 +27,7 @@ Storage::Storage() {
   }
   std::string fileName = "measurement" + std::to_string(files()) + ".csv";
   measurements.open(&fs, fileName.c_str(), O_CREAT | O_WRONLY);
+  printf("Setting working file to: %s\n", fileName.c_str());
 }
 
 /****************************************************/
